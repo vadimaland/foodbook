@@ -1,0 +1,117 @@
+<!-- app/templates/user/homebase.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="et">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>foodbook</title>
+    <link rel="icon" type="image/x-icon" href="{% static 'img/favicon.ico' %}">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}" />
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flaticon-test-uicons@1.7.2/css/all/all.min.css">
+  </head>
+<!-- Lisame stiile -->
+<style>
+  .rainbow-text {
+      background: linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet);
+      -webkit-background-clip: text; /* Toetus WebKit jaoks (Safari, Chrome) */
+      background-clip: text; /* Rakendame gradiendi tekstile */
+      color: transparent; /* Teeme teksti läbipaistvaks, et gradiend oleks nähtav */
+      display: inline-block; /* Et gradiend rakenduks ainult tekstile */
+      animation: rainbow-text 5s linear infinite; /* Gradiendi animatsioon */
+  }
+
+  @keyframes rainbow-text {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 100% 50%; }
+  }
+</style>
+  <body>
+    <div class="container">
+    <nav class="navbar navbar-expand-lg navbar-light py-3 mb-4 border-bottom">
+      <div class="container-xl"><img src="data:image/png;base64,{{ qr_image }}" alt="{{ user.tabel_number }}"  width="85">
+        <!-- Tingimuslik pealkiri -->
+        <a href="/" class="d-flex align-items-center text-decoration-none">
+          <span class="fs-4 
+              {% if user.balance > 50 %}
+                  rainbow-text
+              {% endif %}
+          ">foodbook</span>
+        </a> 
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsExample07XL" aria-controls="navbarsExample07XL" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+  
+        <div class="collapse navbar-collapse" id="navbarsExample07XL">
+          <ul class="nav navbar-nav ms-auto w-100 justify-content-end">
+            {% if 'Superadmin' in user_groups %}
+              <li class="nav-item">
+                <a class="nav-link link-primary" href="/orders">Tellimus</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link link-primary" href="/account">Profiil</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link link-primary" href="/balance">Saldo</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link link-primary" href="/order_archive">Arhiiv</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link link-primary" href="/operator">Operaator</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link link-primary" href="/dish">Roogud</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link link-primary" href="/createmenu">Menüü</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link link-primary" href="/service">Teenindus</a>
+              </li>
+            {% elif 'Manager' in user_groups %}
+              <li class="nav-item">
+                <a class="nav-link link-primary" href="/dish">Roogud</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link link-primary" href="/createmenu">Menüü</a>
+              </li>
+            {% elif 'Operator' in user_groups %}
+              <li class="nav-item">
+                <a class="nav-link link-primary" href="/operator">Operaator</a>
+              </li>
+            {% elif 'Client' in user_groups %}
+              <li class="nav-item">
+                <a class="nav-link link-primary" href="/orders">Tellimus</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link link-primary" href="/account">Profiil</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link link-primary" href="/balance">Saldo</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link link-primary" href="/order_archive">Arhiiv</a>
+              </li>
+            {% endif %}
+            <li class="nav-item">
+              <a class="nav-link link-danger" href="{% url 'logout' %}">Logi välja</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </div>
+<div class="container col-xl-10 col-xxl-8 px-4">
+  <div class="row align-items-start g-lg-5 py-5">
+    {% block content %} 
+    {% endblock %}
+      </div>
+    </div>
+    <script src="{% static 'js/bootstrap.js' %}"></script>
+    <script src="{% static 'js/jquery-3.7.1.min.js' %}"></script>
+    {% block custom_js%}
+    {% endblock %}
+  </body>
+</html>

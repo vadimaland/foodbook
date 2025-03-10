@@ -1,0 +1,36 @@
+# Игнорировать виртуальное окружение
+venv/
+.env
+
+# Конфигурационные файлы IDE
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.log
+
+# Кеши Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Логи и временные файлы
+*.log
+*.bak
+*.swp
+*.tmp
+.DS_Store
+
+# Файлы, которые генерирует `pip`
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Файлы, которые генерирует Django
+*.pyc
+*.pyo
+
+# Файл с паролями
+passwords.py

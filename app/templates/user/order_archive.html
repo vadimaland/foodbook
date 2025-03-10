@@ -1,0 +1,159 @@
+{% extends "user/homebase.html" %}
+{% load static %}
+{% block content %}
+{% for message in messages %}
+{% if message.tags == 'error' %}
+   <div class="alert alert-danger alert-dismissible fade show" role="alert">
+{% else %}
+   <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert">
+{% endif %}
+{{ message }}
+<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+<div class="container">
+    <div class="main-body">
+        <div class="row">
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h3 class="lh-1 text-body-emphasis mb-2">Tellimuste arhiiv</h3>
+                    <div class="row g-3">
+                        <div class="col-sm">
+                            <select id="yearFilter" class="form-select" onchange="filterArchivedTable()">
+                                <option value="all">Kõik aastad</option>
+                                {% for year in years %}
+                                <option value="{{ year }}" {% if year == current_year %}selected{% endif %}>{{ year }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-sm">
+                            <select id="monthFilter" class="form-select" onchange="filterArchivedTable()">
+                                <option value="all">Kõik kuud</option>
+                                {% for month in months %}
+                                <option value="{{ month }}" {% if month == current_month %}selected{% endif %}>{{ month }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+            <!-- Lisame lülitid staatusete jaoks -->
+            <div class="col-sm d-flex justify-content-start align-items-center gap-3">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="status1" checked onchange="filterArchivedTable()">
+                    <label class="form-check-label fs-7" for="status1">Väljastatud</label>
+                </div>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="status3" checked onchange="filterArchivedTable()">
+                    <label class="form-check-label fs-7" for="status3">Aegunud</label>
+                </div>
+            </div>
+        
+        
+        
+                    <div class="accordion mt-3" id="archivedOrdersAccordion">
+                        {% for archived_order in archived_orders_data %}
+                        <div class="accordion-item" data-status="{{ archived_order.status }}">
+                            <h2 class="accordion-header" id="heading{{ archived_order.order_number }}">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ archived_order.order_number }}" aria-expanded="false" aria-controls="collapse{{ archived_order.order_number }}">
+                                    Tellimus #{{ archived_order.order_number }}<br>
+                                    {% if archived_order.status == 1 %}
+                                    Väljastatud
+                                    {% elif archived_order.status == 3 %}
+                                    Aegunud
+                                    {% endif %} - 
+                                        {{ archived_order.city_name }}<br>
+                                        {{ archived_order.archived_at|date:"d.m.Y H:i" }}<br>
+                                        {{ archived_order.total_amount }} EUR
+                                </button>
+                            </h2>
+                            <div id="collapse{{ archived_order.order_number }}" class="accordion-collapse collapse" aria-labelledby="heading{{ archived_order.order_number }}" data-bs-parent="#archivedOrdersAccordion">
+                                <div class="accordion-body">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">Roogud</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    {% for dish in archived_order.dishes %}
+                                                        {{ dish }}<br>
+                                                    {% endfor %}
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <button class="btn btn-primary" onclick="sendReceipt({{ archived_order.order_number }})">Saada tšekk</button>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p>Teil pole veel arhiivitud tellimusi.</p>
+                        {% endfor %}
+                    </div>
+        
+                    <!-- Filtreeritud tellimuste kogusumma väljastamine -->
+                    <div class="mt-3">
+                        <strong>Kokku:</strong>
+                        <span id="totalAmount">0 EUR</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+function sendReceipt(orderNumber) {
+    fetch(`/send_receipt/${orderNumber}/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message);
+    });
+}
+
+function filterArchivedTable() {
+    var yearFilter = document.getElementById("yearFilter").value;
+    var monthFilter = document.getElementById("monthFilter").value;
+    var status1 = document.getElementById("status1").checked;
+    var status3 = document.getElementById("status3").checked;
+
+    var accordionItems = document.querySelectorAll("#archivedOrdersAccordion .accordion-item");
+    var totalAmount = 0; // Muutuja, kuhu salvestada kogusumma
+
+    accordionItems.forEach(function(item) {
+        var orderDate = item.querySelector(".accordion-button").textContent.match(/\d{2}\.\d{2}\.\d{4}/);
+        var status = item.getAttribute("data-status");
+        var amount = parseFloat(item.querySelector(".accordion-button").textContent.match(/\d+\.\d{2} EUR/)[0].replace(" EUR", ""));
+
+        if (orderDate) {
+            var date = new Date(orderDate[0].split('.').reverse().join('-'));
+            var year = date.getFullYear();
+            var month = date.getMonth() + 1; // JavaScriptis kuud loetakse alates 0-st
+
+            var yearMatch = yearFilter === "all" || yearFilter == year;
+            var monthMatch = monthFilter === "all" || monthFilter == month;
+            var statusMatch = (status == 1 && status1) || (status == 3 && status3);
+
+            if (yearMatch && monthMatch && statusMatch) {
+                item.style.display = "block";
+                totalAmount += amount; // Lisame tellimuse summa kogusummale
+            } else {
+                item.style.display = "none";
+            }
+        }
+    });
+
+    // Värskendame kogusummat lehel
+    document.getElementById("totalAmount").textContent = totalAmount.toFixed(2) + " EUR";
+}
+
+// Kutsume filtreerimise funktsiooni lehe laadimisel
+document.addEventListener("DOMContentLoaded", function() {
+    filterArchivedTable();
+});
+</script>
+{% endblock %}

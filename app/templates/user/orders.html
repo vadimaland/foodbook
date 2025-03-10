@@ -1,0 +1,514 @@
+<!-- app/templates/user/orders.html -->
+{% extends "user/homebase.html" %}
+{% load static %}
+{% block content %}
+{% for message in messages %}
+{% if message.tags == 'error' %}
+   <div class="alert alert-danger alert-dismissible fade show" role="alert">
+{% else %}
+   <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert">
+{% endif %}
+{{ message }}
+<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor%}
+
+<div class="col-md-8 col-lg-6">
+  {% if grouped_menu_cw %}
+  <h3 class="display-6 lh-1 text-body-emphasis mb-3">Jooksev nädal {{week1}}</h3>  
+      {% for day, categories in grouped_menu_cw.items %}
+      <ul class="list-group mb-3 shadow">
+        <!-- Rakendame igale nädalapäevale taustavärvi -->
+        {% if day == 'Esmaspäev' %}
+        <li class="list-group-item bg-primary-subtle d-flex justify-content-end align-items-start">
+        {% elif day == 'Teisipäev' %}
+        <li class="list-group-item bg-success-subtle d-flex justify-content-end align-items-start">
+        {% elif day == 'Kolmapäev' %}
+        <li class="list-group-item bg-danger-subtle d-flex justify-content-end align-items-start">
+        {% elif day == 'Neljapäev' %}
+        <li class="list-group-item bg-warning-subtle d-flex justify-content-end align-items-start">
+        {% elif day == 'Reede' %}
+        <li class="list-group-item bg-info-subtle d-flex justify-content-end align-items-start">
+        {% else %}
+        <li class="list-group-item d-flex justify-content-end align-items-start">
+        {% endif %}
+          <div class="ms-2">
+            <h5>{{ day }}</h5>
+          </div>
+          <select class="form-select-sm ms-auto city-select" data-day="{{ day }}">
+            {% for city in cities %}
+              {% if city.id == user.city_id %}
+              <option value="{{ city.id }}"  selected>{{ city.name }}</option>
+              {% else %}
+              <option value="{{ city.id }}">{{ city.name }}</option>
+              {% endif %}
+            {% endfor %}
+          </select>
+        </li>
+        {% for category, dishes in categories.items %}
+        <li class="list-group-item d-flex justify-content-between align-items-start w-100">
+          <div class="ms-2 w-100">
+            {% if category == 'Supp' %}
+            <div class="fw-bold">{{ category }} <i class="fi fi-bs-soup"></i></div>
+            {% elif category == 'Lisand' %}
+            <div class="fw-bold">{{ category }} <i class="fi fi-bs-french-fries"></i></div>
+            {% elif category == 'Pearoog' %}
+            <div class="fw-bold">{{ category }} <i class="fi fi-bs-turkey"></i></div>
+            {% elif category == 'Salat' %}
+            <div class="fw-bold">{{ category }} <i class="fi fi-bs-salad"></i></div>
+            {% else %}
+            <div class="fw-bold">{{ category }}</div>
+            {% endif %}
+            <ul class="list-group list-group-flush w-100">
+              {% for dish, price in dishes %}
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span>{{ dish }} ({{ price|stringformat:".2f" }} EUR)</span>
+                <form method="post" action="{% url 'add_to_cart' %}" style="display:inline;" data-key="{{ week }}:{{ day }}:{{ city.id }}">
+                  {% csrf_token %}
+                  <input type="hidden" name="dish_name" value="{{ dish }}">
+                  <input type="hidden" name="dish_price" value="{{ price|stringformat:".2f" }}">
+                  <input type="hidden" name="day" value="{{ day }}">
+                  <input type="hidden" name="city" class="city-input" value="{{user.city_id}}">
+                  <input type="hidden" name="week" value="{{ week1 }}"> <!-- Lisame nädala numbri -->
+                  <button type="submit" class="btn btn-primary btn-sm ms-auto"><i class="uil uil-shopping-cart"></i></button>
+                </form>
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+      {% endfor %}
+  {% endif %}
+  
+  {% if grouped_menu_nw %}
+  <h3 class="display-6 lh-1 text-body-emphasis mb-3">Järgmine nädal {{week2}}</h3>
+  {% for day, categories in grouped_menu_nw.items %}
+  <ul class="list-group mb-3 shadow">
+    <!-- Rakendame igale nädalapäevale taustavärvi -->
+    {% if day == 'Esmaspäev' %}
+    <li class="list-group-item bg-primary-subtle d-flex justify-content-end align-items-start">
+    {% elif day == 'Teisipäev' %}
+    <li class="list-group-item bg-success-subtle d-flex justify-content-end align-items-start">
+    {% elif day == 'Kolmapäev' %}
+    <li class="list-group-item bg-danger-subtle d-flex justify-content-end align-items-start">
+    {% elif day == 'Neljapäev' %}
+    <li class="list-group-item bg-warning-subtle d-flex justify-content-end align-items-start">
+    {% elif day == 'Reede' %}
+    <li class="list-group-item bg-info-subtle d-flex justify-content-end align-items-start">
+    {% else %}
+    <li class="list-group-item d-flex justify-content-end align-items-start">
+    {% endif %}
+      <div class="ms-2">
+        <h5>{{ day }}</h5>
+      </div>
+      <select class="form-select-sm form-select-sm ms-auto city-select" data-day="{{ day }}">
+        {% for city in cities %}
+          {% if city.id == user.city_id %}
+          <option value="{{ city.id }}"  selected>{{ city.name }}</option>
+          {% else %}
+          <option value="{{ city.id }}">{{ city.name }}</option>
+          {% endif %}
+        {% endfor %}
+      </select>
+    </li>
+    {% for category, dishes in categories.items %}
+    <li class="list-group-item d-flex justify-content-between align-items-start">
+      <div class="ms-2 w-100">
+        {% if category == 'Supp' %}
+        <div class="fw-bold">{{ category }} <i class="fi fi-bs-soup"></i></div>
+        {% elif category == 'Lisand' %}
+        <div class="fw-bold">{{ category }} <i class="fi fi-bs-french-fries"></i></div>
+        {% elif category == 'Pearoog' %}
+        <div class="fw-bold">{{ category }} <i class="fi fi-bs-turkey"></i></div>
+        {% elif category == 'Salat' %}
+        <div class="fw-bold">{{ category }} <i class="fi fi-bs-salad"></i></div>
+        {% else %}
+        <div class="fw-bold">{{ category }}</div>
+        {% endif %}
+        <ul class="list-group list-group-flush w-100">
+          {% for dish, price in dishes %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <span>{{ dish }} ({{ price|stringformat:".2f" }} EUR)</span>
+              <form method="post" action="{% url 'add_to_cart' %}" style="display:inline;" data-key="{{ week }}:{{ day }}:{{ city.id }}">
+                {% csrf_token %}
+                <input type="hidden" name="dish_name" value="{{ dish }}">
+                <input type="hidden" name="dish_price" value="{{ price|stringformat:".2f" }}">
+                <input type="hidden" name="day" value="{{ day }}">
+                <input type="hidden" name="city" class="city-input" value="{{user.city_id}}">
+                <input type="hidden" name="week" value="{{ week2 }}"> <!-- Lisame nädala numbri -->
+                <button type="submit" class="btn btn-primary btn-sm ms-auto"><i class="uil uil-shopping-cart"></i></button>
+              </form>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+  {% endfor %}
+  {% else %}
+    <p>Järgneva nädala andmeid pole.</p>
+  {% endif %}
+</div>
+
+<div class="col-md-6 order-1 order-md-2">
+  <div class="card border-primary mb-3 shadow" style="margin-top: 60px;">
+    <div class="card-body">
+      <div class="text-center mb-2">
+        <span class="fw-bold">Ostukorv</span>
+      </div>
+      <div class="d-flex justify-content-end">
+        <h6 class="card-subtitle mb-0">
+          Saldo: {{ user.balance|stringformat:".2f" }} EUR
+        </h6>
+    </div>
+      <ul class="list-group list-group-flush" id="cart">
+        <!-- Siin kuvatakse lisatud road -->
+      </ul>
+      <form method="post" action="{% url 'submit_order' %}" style="margin-top: 20px;">
+        {% csrf_token %}
+        <input type="hidden" name="cart_items" id="cart_items" value="">
+        <input type="hidden" name="quantities" id="quantities" value="">
+        <input type="hidden" name="days" id="days" value="">
+        <input type="hidden" name="cities" id="cities" value="">
+        <input type="hidden" name="weeks" id="weeks" value="">
+        <div class="d-flex justify-content-end">
+          <button type="submit" class="btn btn-success btn-block btn-sm me-3">Telli</button>
+          <a href="{% url 'orders' %}" class="btn btn-danger btn-sm">Tühista</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  
+  <div class="card border-primary mb-3 shadow">
+    <div class="card-body">
+        <div class="text-center mb-2">
+            <span class="fw-bold">Aktiivsed tellimused</span>
+        </div>
+        <ul class="list-group list-group-flush" id="weekly-menu">
+            {% for week, orders in grouped_orders.items %}
+                <li class="mb-2 list-group-item list-group-item-primary">
+                    <h5>Nädal {{ week }}</h5>
+                </li>
+                {% for order_number, cities in orders.items %}
+                    {% for city, days in cities.items %}
+                        {% for day_name, day_data in days.items %}
+                            <li class="d-flex justify-content-between align-items-center flex-wrap">
+                                <div>
+                                    <span class="fw-bold">{{ day_name }}</span>
+                                    <span> - {{ city }} </span>
+                                </div>
+                                {% if day_data.deletable %}
+                                    <form id="form-{{ order_number }}" action="{% url 'delete_order' order_number %}" method="post" style="display:inline;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="order_number" value="{{ order_number }}">
+                                        <button type="button" class="btn btn-danger btn-sm delete-order-button" data-order-number="{{ order_number }}"><i class="uil uil-trash-alt"></i></button>
+                                    </form>
+                                {% else %}
+                                    <!-- Kui tellimust ei saa kustutada, kuvame teate või teeme nupu inaktiivseks -->
+                                    <button type="button" class="btn btn-secondary btn-sm" disabled title="Tellimus on juba esitatud"><i class="uil uil-trash-alt"></i></button>
+                                {% endif %}
+                            </li>
+                            {% for dish, data in day_data.dishes.items %}
+                                <li class="d-flex justify-content-between align-items-center">
+                                    <span class="ps-3">{{ dish }} (x {{ data.quantity }}) - {{ data.total_price }} EUR</span>
+                                </li>
+                            {% endfor %}
+                        {% endfor %}
+                    {% endfor %}
+                {% endfor %}
+            {% endfor %}
+            <hr>
+            <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                <h6 class="card-subtitle mb-0"></h6>
+                <span class="text">Kokku: {{ total_sum|stringformat:".2f" }} EUR</span>
+            </li>
+        </ul>
+    </div>
+</div>
+</div>
+</div>
+</div>
+<!-- Modaalne kustutamise kinnitamise aken -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmDeleteModalLabel">Kustutamise kinnitamine</h5>
+        <button type="button" class="btn btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Kas olete kindel, et soovite selle tellimuse kustutada?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tühista</button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteButton">Kustuta</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+  const citySelects = document.querySelectorAll('.city-select');
+  const forms = document.querySelectorAll('form[action="{% url 'add_to_cart' %}"]');
+  const cart = document.getElementById('cart');
+  const cartItems = {};
+  let totalPrice = 0;
+  const lockedDays = new Set();
+  const cityNames = {
+    {% for city in cities %}
+      {{ city.id }}: "{{ city.name }}",
+    {% endfor %}
+  };
+
+ // Hankime kasutaja saldot
+ const userBalance = parseFloat("{{ user.balance|floatformat:2 }}");
+
+  // Uuenda linna sisendi väärtust, kui linna valik muutub
+  citySelects.forEach(select => {
+    select.addEventListener('change', function() {
+      const day = select.getAttribute('data-day');
+      const formsForDay = document.querySelectorAll(`form[data-key*="${day}"]`);
+      formsForDay.forEach(form => {
+        const cityInput = form.querySelector('input[name="city"]');
+        if (cityInput) {
+          cityInput.value = select.value;
+        }
+      });
+    });
+  });
+  
+// Funktsioon ostukorvi kuvamise uuendamiseks
+function updateCart() {
+  cart.innerHTML = '';
+  totalPrice = 0;
+  for (const [key, dishes] of Object.entries(cartItems)) {
+    const [week, day, city] = key.split(':');
+    const cityLi = document.createElement('li');
+    cityLi.className = 'list-group-item list-group-item-primary';
+    cityLi.innerHTML = `<h6 class="mb-0">Nädal: ${week}, ${day} : ${cityNames[city]}</h6>`;
+    cart.appendChild(cityLi);
+
+    for (const [dish, data] of Object.entries(dishes)) {
+      const dishLi = document.createElement('li');
+      dishLi.className = 'list-group-item d-flex justify-content-between align-items-center flex-wrap';
+
+      // Arvutame roa kogumaksumuse ja vormindame selle kahe kümnendkohani
+      const totalForDish = (data.quantity * data.price).toFixed(2);
+
+      dishLi.innerHTML = `
+        <span class="text-secondary">${dish}</span>
+        <div>
+          <button class="btn btn-sm btn-success add-quantity me-2 uil uil-plus" data-key="${key}" data-dish="${dish}"></button>
+          <span class="text-secondary">${data.quantity}</span>
+          <button class="btn btn-sm btn-danger remove-quantity ms-2 me-3 uil uil-minus" data-key="${key}" data-dish="${dish}"></button>
+          <span class="text-secondary">${totalForDish} EUR</span>
+          <button class="btn btn-sm btn-danger remove-dish ms-2 uil uil-trash-alt" data-key="${key}" data-dish="${dish}"></button>
+        </div>
+      `;
+      cart.appendChild(dishLi);
+
+      // Konverteerime väärtuse uuesti arvuks enne kogusumma lisamist
+      totalPrice += parseFloat(totalForDish);
+    }
+  }
+
+  // Vormindame kogusumma kahe kümnendkohani
+  const formattedTotalPrice = totalPrice.toFixed(2);
+
+  const totalPriceElement = document.createElement('li');
+  totalPriceElement.className = 'list-group-item d-flex justify-content-between align-items-center flex-wrap';
+  totalPriceElement.innerHTML = `<h6 class="card-subtitle mb-0"></h6><span class="text">Kokku: ${formattedTotalPrice} EUR</span>`;
+  cart.appendChild(totalPriceElement);
+
+  updateHiddenFields();
+  updateCitySelects(); // Värskendame linnavalikute olekut
+}
+
+  // Funktsioon peidetud väljade uuendamiseks
+  function updateHiddenFields() {
+    const cartItemsInput = document.getElementById('cart_items');
+    const quantitiesInput = document.getElementById('quantities');
+    const daysInput = document.getElementById('days');
+    const citiesInput = document.getElementById('cities');
+    const weeksInput = document.getElementById('weeks');
+
+    const cartItemsList = [];
+    const quantitiesList = [];
+    const daysList = [];
+    const citiesList = [];
+    const weeksList = [];
+
+    for (const [key, dishes] of Object.entries(cartItems)) {
+      const [week, day, city] = key.split(':');
+      for (const [dish, data] of Object.entries(dishes)) {
+        cartItemsList.push(dish);
+        quantitiesList.push(data.quantity);
+        daysList.push(day);
+        citiesList.push(city);
+        weeksList.push(week);
+      }
+    }
+
+    cartItemsInput.value = JSON.stringify(cartItemsList);
+    quantitiesInput.value = JSON.stringify(quantitiesList);
+    daysInput.value = JSON.stringify(daysList);
+    citiesInput.value = JSON.stringify(citiesList);
+    weeksInput.value = JSON.stringify(weeksList);
+  }
+  // Funktsioon linnavalikute uuendamiseks
+  function updateCitySelects() {
+    citySelects.forEach(select => {
+      const day = select.getAttribute('data-day');
+      const week = select.closest('ul').querySelector('input[name="week"]').value;
+      const city = select.value;
+      const key = `${week}:${day}:${city}`;
+      select.disabled = lockedDays.has(key);
+    });
+  }
+
+  // Vormi esitamise sündmuse käitleja
+  forms.forEach(form => {
+    form.addEventListener('submit', function(event) {
+      event.preventDefault();
+      const dishName = this.querySelector('input[name="dish_name"]').value;
+      const dishPrice = parseFloat(this.querySelector('input[name="dish_price"]').value);
+      const week = this.querySelector('input[name="week"]').value;
+      const day = this.querySelector('input[name="day"]').value;
+      const city = this.querySelector('input[name="city"]').value;
+      const key = `${week}:${day}:${city}`;
+
+      // Arvutame ostukorvi kogumaksumuse uue toote lisamisel
+      const newTotalPrice = totalPrice + dishPrice;
+
+      // Kontrollime, kas kasutajal on piisavalt vahendeid
+      if (newTotalPrice > userBalance) {
+        alert("Kontol pole piisavalt vahendeid toote lisamiseks.");
+        return; // Lõpetame täitmise, kui saldo on ebapiisav
+      }
+
+      if (!cartItems[key]) {
+        cartItems[key] = {};
+      }
+
+      if (cartItems[key][dishName]) {
+        delete cartItems[key][dishName];
+        if (Object.keys(cartItems[key]).length === 0) {
+          delete cartItems[key];
+          lockedDays.delete(key); // Eemaldame võtme, mis sisaldab nädalat
+        }
+      } else {
+        cartItems[key][dishName] = { quantity: 1, price: dishPrice };
+        lockedDays.add(key); // Lisame võtme, mis sisaldab nädalat
+      }
+
+      updateCart();
+      updateButtonColors();
+    });
+  });
+
+  // Nuppude "+" ja "-" sündmuse käitleja
+  cart.addEventListener('click', function(event) {
+    if (event.target.classList.contains('add-quantity') || event.target.classList.contains('remove-quantity') || event.target.classList.contains('remove-dish')) {
+      const key = event.target.getAttribute('data-key');
+      const dish = event.target.getAttribute('data-dish');
+
+      if (event.target.classList.contains('add-quantity')) {
+        // Kontrollime, kas vahendeid on piisavalt koguse suurendamiseks
+        const newTotalPrice = totalPrice + cartItems[key][dish].price;
+        if (newTotalPrice > userBalance) {
+          alert("Kontol pole piisavalt vahendeid koguse suurendamiseks.");
+          return; // Lõpetame täitmise, kui saldo on ebapiisav
+        }
+        cartItems[key][dish].quantity += 1;
+      } else if (event.target.classList.contains('remove-quantity')) {
+        if (cartItems[key][dish].quantity > 1) {
+          cartItems[key][dish].quantity -= 1;
+        } else {
+          delete cartItems[key][dish];
+          if (Object.keys(cartItems[key]).length === 0) {
+            delete cartItems[key];
+            lockedDays.delete(key); // Eemaldame võtme, mis sisaldab nädalat
+          }
+        }
+      } else if (event.target.classList.contains('remove-dish')) {
+        delete cartItems[key][dish];
+        if (Object.keys(cartItems[key]).length === 0) {
+          delete cartItems[key];
+          lockedDays.delete(key); // Eemaldame võtme, mis sisaldab nädalat
+        }
+      }
+
+      updateCart();
+      updateButtonColors();
+    }
+  });
+
+  // Funktsioon nuppude värvide uuendamiseks
+  function updateButtonColors() {
+    forms.forEach(form => {
+      const week = form.querySelector('input[name="week"]').value;
+      const day = form.querySelector('input[name="day"]').value;
+      const city = form.querySelector('input[name="city"]').value;
+      const key = `${week}:${day}:${city}`;
+      const dishName = form.querySelector('input[name="dish_name"]').value;
+      const button = form.querySelector('button[type="submit"]');
+
+      if (cartItems[key] && cartItems[key][dishName]) {
+        button.classList.remove('btn-primary');
+        button.classList.add('btn-warning');
+      } else {
+        button.classList.remove('btn-warning');
+        button.classList.add('btn-primary');
+      }
+    });
+  }
+
+  // Ostukorvi ja nuppude värvide initsiaalne uuendus
+  updateCart();
+  updateButtonColors();
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Leidame kõik kustutamisnupud
+  const deleteButtons = document.querySelectorAll('.delete-order-button');
+
+  // Leidame modaalakna ja kustutamise kinnitamise nupu
+  const confirmDeleteModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
+  const confirmDeleteButton = document.getElementById('confirmDeleteButton');
+
+  deleteButtons.forEach(button => {
+      button.addEventListener('click', function(event) {
+          event.preventDefault();
+          const orderNumber = this.getAttribute('data-order-number');
+          const deleteForm = this.closest('form');
+          console.log('Order number:', orderNumber);
+          console.log('Delete form ID:', deleteForm.id);
+          // Seadistame andmeatribuudi data-order-number kustutamise kinnitamise nupule
+          confirmDeleteButton.setAttribute('data-order-number', orderNumber);
+          confirmDeleteButton.setAttribute('data-delete-form', deleteForm.id); // Set the form ID
+          // Avame modaalakna
+          confirmDeleteModal.show();
+      });
+  });
+
+  // Käsitleme kustutamise kinnitamise nupu vajutust
+  confirmDeleteButton.addEventListener('click', function() {
+    const orderNumber = this.getAttribute('data-order-number');
+    const deleteFormId = this.getAttribute('data-delete-form');
+    const form = document.getElementById(deleteFormId);
+    console.log('Form to submit:', form);
+    if (form) {
+        form.submit();
+    } else {
+        console.error('Kustutamiseks mõeldud vormi ei leitud.');
+    }
+      // Sulgeme modaalakna
+      confirmDeleteModal.hide();
+  });
+});
+</script>
+{% endblock %}

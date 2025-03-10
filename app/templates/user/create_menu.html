@@ -1,0 +1,545 @@
+{% extends "user/homebase.html" %}
+{% load static %}
+{% block content %}
+{% for message in messages %}
+{% if message.tags == 'error' %}
+   <div class="alert alert-danger alert-dismissible fade show" role="alert">
+{% else %}
+   <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert">
+{% endif %}
+{{ message }}
+<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+<div id="lst" class="d-flex flex-column">
+
+    <div class="col">
+        <h3 class="display-4 lh-1 text-body-emphasis">Nädala muutmine</h3>
+        <div class="d-flex flex-row">
+            <div class="mb-1 me-2">
+                <select id="existing_week_nr" class="form-select">
+                    <option value="">Nädal</option>
+                    {% for week in menu_weeks %}
+                    <option value="{{ week }}">{{ week }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <!-- Nädala valik -->
+            <div class="mb-1 me-2 w-50">
+                <input type="number" id="new_week_nr" class="form-control" min="1" max="52" placeholder="Uus nädalanumber">
+            </div>
+            <div class="mb-1"><button id="replace_week_btn" class="btn btn-primary">Asendamine</button></div>
+            </div>
+    </div>
+
+    <div class="col">
+        <h3 class="display-4 lh-1 text-body-emphasis mb-3">Menüü lisamine</h3>
+        <div class="d-flex flex-row">
+            <div class="d-inline mb-1 me-2">
+                <select id="year_nr" name="year_nr" class="form-select">
+                    <option value="">Aasta</option>
+                    <option value="{{ current_year }}" selected>{{ current_year }}</option>
+                    <option value="{{ next_year }}">{{ next_year }}</option>
+                </select>
+            </div>
+            
+            <!-- Nädala valik -->
+            <div class=" d-inline mb-1 ">
+                <select id="week_nr" name="week_nr" class="form-select">
+                    <option value="">Nädal</option>
+                    {% for week in selected_weeks %}
+                    <option value="{{ week }}" {% if week == next_week %}selected{% endif %}>{{ week }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            </div>
+    </div>
+
+
+</div>
+ 
+
+<!-- Päevade valikuga vahekaardid -->
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="monday-tab" data-bs-toggle="tab" data-bs-target="#monday" type="button" role="tab" aria-controls="monday" aria-selected="true">Esmaspäev</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tuesday-tab" data-bs-toggle="tab" data-bs-target="#tuesday" type="button" role="tab" aria-controls="tuesday" aria-selected="false">Teisipäev</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="wednesday-tab" data-bs-toggle="tab" data-bs-target="#wednesday" type="button" role="tab" aria-controls="wednesday" aria-selected="false">Kolmapäev</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="thursday-tab" data-bs-toggle="tab" data-bs-target="#thursday" type="button" role="tab" aria-controls="thursday" aria-selected="false">Neljapäev</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="friday-tab" data-bs-toggle="tab" data-bs-target="#friday" type="button" role="tab" aria-controls="friday" aria-selected="false">Reede</button>
+    </li>
+</ul>
+
+<!-- Vahekaardi sisu -->
+<div class="tab-content" id="myTabContent">
+    <div class="tab-pane col-md-8 col-lg-6 fade show active" id="monday" role="tabpanel" aria-labelledby="home-tab">
+        <form method="post" action="{% url 'upd_menu' %}"  class="needs-validation" novalidate>
+            <input name="day_nr" value="1" type="hidden">
+            <input id="week_nr_hidden_monday" name="week_nr" type="hidden">
+            {% csrf_token %}
+            <div class="mb-3">
+                <select name="soup_id"  class="form-select" >
+                    <option selected>Valige supp</option>
+                    {% for soup in soups %}
+                    <option value="{{ soup.id }}">{{ soup.dish_name }}</option>
+                    {% endfor %}
+                  </select>
+            </div>
+            <div class="mb-3">
+                <select name="main_id"  class="form-select" >
+                    <option selected>Valige põhiroog</option>
+                    {% for main in mains %}
+                    <option value="{{ main.id }}">{{ main.dish_name }}</option>
+                    {% endfor %}
+                  </select>
+            </div>
+            <div class="mb-3">
+                <select name="garnish_id" class="form-select" >
+                    <option selected>Valige lisand</option>
+                    {% for garnish in garnishes %}
+                    <option value="{{ garnish.id }}">{{ garnish.dish_name }}</option>
+                    {% endfor %}
+                  </select>
+            </div>
+            <div class="mb-3">
+                <select name="salat_id" class="form-select" >
+                    <option selected>Valige salat</option>
+                    {% for salat in salats %}
+                    <option value="{{ salat.id }}">{{ salat.dish_name }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+            <button type="submit" class="btn btn-primary">Lisa menüüsse</button>
+        </form>
+    </div>
+    <div class="tab-pane col-md-8 col-lg-6 fade show" id="tuesday" role="tabpanel" aria-labelledby="home-tab">
+        <form method="post" action="{% url 'upd_menu' %}"  class="needs-validation" novalidate>
+            <input name="day_nr" value="2" type="hidden">
+            <input id="week_nr_hidden_tuesday" name="week_nr" type="hidden">
+            {% csrf_token %}
+            <div class="mb-3">
+                <select name="soup_id"  class="form-select" >
+                    <option selected>Valige supp</option>
+                    {% for soup in soups %}
+                    <option value="{{ soup.id }}">{{ soup.dish_name }}</option>
+                    {% endfor %}
+                  </select>
+            </div>
+            <div class="mb-3">
+                <select name="main_id"  class="form-select" >
+                    <option selected>Valige põhiroog</option>
+                    {% for main in mains %}
+                    <option value="{{ main.id }}">{{ main.dish_name }}</option>
+                    {% endfor %}
+                  </select>
+            </div>
+            <div class="mb-3">
+                <select name="garnish_id" class="form-select" >
+                    <option selected>Valige lisand</option>
+                    {% for garnish in garnishes %}
+                    <option value="{{ garnish.id }}">{{ garnish.dish_name }}</option>
+                    {% endfor %}
+                  </select>
+            </div>
+            <div class="mb-3">
+                <select name="salat_id" class="form-select" >
+                    <option selected>Valige salat</option>
+                    {% for salat in salats %}
+                    <option value="{{ salat.id }}">{{ salat.dish_name }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+            <button type="submit" class="btn btn-primary">Lisa menüüsse</button>
+        </form>
+    </div>
+    <div class="tab-pane col-md-8 col-lg-6 fade show" id="wednesday" role="tabpanel" aria-labelledby="home-tab">
+        <form method="post" action="{% url 'upd_menu' %}"  class="needs-validation" novalidate>
+            <input name="day_nr" value="3" type="hidden">
+            <input id="week_nr_hidden_wednesday" name="week_nr" type="hidden">
+            {% csrf_token %}
+            <div class="mb-3">
+                <select name="soup_id"  class="form-select" >
+                    <option selected>Valige supp</option>
+                    {% for soup in soups %}
+                    <option value="{{ soup.id }}">{{ soup.dish_name }}</option>
+                    {% endfor %}
+                  </select>
+            </div>
+            <div class="mb-3">
+                <select name="main_id"  class="form-select" >
+                    <option selected>Valige põhiroog</option>
+                    {% for main in mains %}
+                    <option value="{{ main.id }}">{{ main.dish_name }}</option>
+                    {% endfor %}
+                  </select>
+            </div>
+            <div class="mb-3">
+                <select name="garnish_id" class="form-select" >
+                    <option selected>Valige lisand</option>
+                    {% for garnish in garnishes %}
+                    <option value="{{ garnish.id }}">{{ garnish.dish_name }}</option>
+                    {% endfor %}
+                  </select>
+            </div>
+            <div class="mb-3">
+                <select name="salat_id" class="form-select" >
+                    <option selected>Valige salat</option>
+                    {% for salat in salats %}
+                    <option value="{{ salat.id }}">{{ salat.dish_name }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+            <button type="submit" class="btn btn-primary">Lisa menüüsse</button>
+        </form>
+    </div>
+    <div class="tab-pane col-md-8 col-lg-6 fade show" id="thursday" role="tabpanel" aria-labelledby="home-tab">
+        <form method="post" action="{% url 'upd_menu' %}"  class="needs-validation" novalidate>
+            <input name="day_nr" value="4" type="hidden">
+            <input id="week_nr_hidden_thursday" name="week_nr" type="hidden">
+            {% csrf_token %}
+            <div class="mb-3">
+                <select name="soup_id"  class="form-select" >
+                    <option selected>Valige supp</option>
+                    {% for soup in soups %}
+                    <option value="{{ soup.id }}">{{ soup.dish_name }}</option>
+                    {% endfor %}
+                  </select>
+            </div>
+            <div class="mb-3">
+                <select name="main_id"  class="form-select" >
+                    <option selected>Valige põhiroog</option>
+                    {% for main in mains %}
+                    <option value="{{ main.id }}">{{ main.dish_name }}</option>
+                    {% endfor %}
+                  </select>
+            </div>
+            <div class="mb-3">
+                <select name="garnish_id" class="form-select" >
+                    <option selected>Valige lisand</option>
+                    {% for garnish in garnishes %}
+                    <option value="{{ garnish.id }}">{{ garnish.dish_name }}</option>
+                    {% endfor %}
+                  </select>
+            </div>
+            <div class="mb-3">
+                <select name="salat_id" class="form-select" >
+                    <option selected>Valige salat</option>
+                    {% for salat in salats %}
+                    <option value="{{ salat.id }}">{{ salat.dish_name }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+            <button type="submit" class="btn btn-primary">Lisa menüüsse</button>
+        </form>
+    </div>
+    <div class="tab-pane col-md-8 col-lg-6 fade show" id="friday" role="tabpanel" aria-labelledby="home-tab">
+        <form method="post" action="{% url 'upd_menu' %}"  class="needs-validation" novalidate>
+            <input name="day_nr" value="5" type="hidden">
+            <input id="week_nr_hidden_friday" name="week_nr" type="hidden">
+            {% csrf_token %}
+            <div class="mb-3">
+                <select name="soup_id"  class="form-select" >
+                    <option selected>Valige supp</option>
+                    {% for soup in soups %}
+                    <option value="{{ soup.id }}">{{ soup.dish_name }}</option>
+                    {% endfor %}
+                  </select>
+            </div>
+            <div class="mb-3">
+                <select name="main_id"  class="form-select" >
+                    <option selected>Valige põhiroog</option>
+                    {% for main in mains %}
+                    <option value="{{ main.id }}">{{ main.dish_name }}</option>
+                    {% endfor %}
+                  </select>
+            </div>
+            <div class="mb-3">
+                <select name="garnish_id" class="form-select" >
+                    <option selected>Valige lisand</option>
+                    {% for garnish in garnishes %}
+                    <option value="{{ garnish.id }}">{{ garnish.dish_name }}</option>
+                    {% endfor %}
+                  </select>
+            </div>
+            <div class="mb-3">
+                <select name="salat_id" class="form-select" >
+                    <option selected>Valige salat</option>
+                    {% for salat in salats %}
+                    <option value="{{ salat.id }}">{{ salat.dish_name }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+            <button type="submit" class="btn btn-primary">Lisa menüüsse</button>
+        </form>
+    </div>
+</div>
+
+<h3 class="display-4 lh-1 text-body-emphasis mb-3 mt-5">Olemasolev menüü</h3>
+<div class="mb-1 w-25">
+    <select id="filter_week" onchange="filterTable()" class="form-select">
+        <option value="all" selected>Kõik nädalad</option>
+        {% for week in menu_weeks %}
+        <option value="{{ week }}">{{ week }}</option>
+        {% endfor %}
+    </select>
+</div>
+<div class="mb-1 w-25">
+    <select id="filter_day" onchange="filterTable()" class="form-select">
+        <option value="all" selected>Kõik päevad</option>
+        <option value="Esmaspäev">Esmaspäev</option>
+        <option value="Teisipäev">Teisipäev</option>
+        <option value="Kolmapäev">Kolmapäev</option>
+        <option value="Neljapäev">Neljapäev</option>
+        <option value="Reede">Reede</option>
+    </select>
+</div>
+<table class="table table-striped" id="w_menu">
+    <thead>
+        <tr>
+            <th scope="col">Nädal</th>
+            <th scope="col">Päev</th>
+            <th scope="col">Kategooria</th>
+            <th scope="col">Roog</th>
+            <th scope="col">Toimingud</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in menu_items %}
+        <tr>
+            <td data-id="{{ item.id }}" data-type="week_number">{{ item.week_number.number }}</td>
+            <td data-id="{{ item.id }}" data-type="weekday_id">{{ item.weekday_id.weekday_name }}</td>
+            <td data-id="{{ item.id }}" data-category-id="{{ item.dish_id.category.id }}">{{ item.dish_id.category.category_name }}</td>
+            <td data-id="{{ item.id }}" data-type="dish_id">{{ item.dish_id.dish_name }}</td>
+            <td>
+                <button class="btn btn-danger btn-sm delete-menu-item" data-id="{{ item.id }}"><i class="uil uil-trash-alt"></i></button>
+                <button class="btn btn-primary btn-sm edit-menu-item" data-id="{{ item.id }}"><i class="uil uil-edit"></i></button>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+{% block custom_js %}
+
+<script>
+    const mediaQuery = window.matchMedia('(min-width: 768px)')
+    let elem = document.getElementById("lst");
+    function handleTabletChange(e) {
+      // Kontrolli, kas meediapäringu tingimus on täidetud
+      if (e.matches) {
+        elem.classList.remove("flex-column");
+        elem.classList.add("flex-row-reverse");        
+      } else {
+        elem.classList.remove("flex-row-reverse");
+        elem.classList.add("flex-column");  
+      }
+    }
+    // Registreeri sündmuse kuulaja
+    mediaQuery.addListener(handleTabletChange)
+    
+    // Esialgne kontroll
+    handleTabletChange(mediaQuery)
+
+document.getElementById('week_nr').addEventListener('change', function() {
+    var selectedWeek = this.value;
+    document.getElementById('week_nr_hidden_monday').value = selectedWeek;
+    document.getElementById('week_nr_hidden_tuesday').value = selectedWeek;
+    document.getElementById('week_nr_hidden_wednesday').value = selectedWeek;
+    document.getElementById('week_nr_hidden_thursday').value = selectedWeek;
+    document.getElementById('week_nr_hidden_friday').value = selectedWeek;
+});
+
+function filterTable() {
+    const filterWeekValue = document.getElementById('filter_week').value.toLowerCase();
+    const filterDayValue = document.getElementById('filter_day').value; // Päeva tekstiline väärtus
+    const table = document.getElementById('w_menu');
+    const rows = table.getElementsByTagName('tr');
+
+    for (let i = 1; i < rows.length; i++) {
+        const weeknumber = rows[i].getElementsByTagName('td')[0];
+        const weekday = rows[i].getElementsByTagName('td')[1];
+
+        if (weeknumber && weekday) {
+            const weekText = weeknumber.textContent.toLowerCase();
+            const dayText = weekday.textContent; // Päeva tekstiline väärtus tabelist
+
+            const showWeek = filterWeekValue === '' || filterWeekValue === 'all' || weekText === filterWeekValue;
+            const showDay = filterDayValue === 'all' || dayText === filterDayValue;
+
+            if (showWeek && showDay) {
+                rows[i].style.display = '';
+            } else {
+                rows[i].style.display = 'none';
+            }
+        }
+    }
+}
+
+document.querySelectorAll('.delete-menu-item').forEach(button => {
+    button.addEventListener('click', function() {
+        const menuItemId = this.getAttribute('data-id');
+        const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+
+        fetch(`/delete_menu_item/${menuItemId}/`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken,
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                this.closest('tr').remove();
+            } else {
+                alert('Viga menüüelemendi kustutamisel');
+            }
+        })
+        .catch(error => {
+            console.error('Viga:', error);
+        });
+    });
+});
+
+document.querySelectorAll('.edit-menu-item').forEach(button => {
+    button.addEventListener('click', function() {
+        const menuItemId = this.getAttribute('data-id');
+        const row = this.closest('tr');
+        const cells = row.querySelectorAll('td');
+
+        const originalData = {
+            weekNumber: cells[0].textContent,
+            weekday: cells[1].textContent,
+            category: cells[2].textContent,
+            dishName: cells[3].textContent,
+        };
+        
+        cells[0].innerHTML = `<input type='text' class='input-data' value='${originalData.weekNumber}' disabled>`;
+        cells[1].innerHTML = `<input type='text' class='input-data' value='${originalData.weekday}' disabled>`;
+        cells[2].innerHTML = `<input type='text' class='input-data' value='${originalData.category}' disabled>`;
+
+        const categoryId = cells[2].getAttribute('data-category-id');
+        if (categoryId) {
+            fetch(`/get_dishes_by_category/${categoryId}/`)
+                .then(response => response.json())
+                .then(data => {
+                    const dishSelect = document.createElement('select');
+                    dishSelect.classList.add('form-select', 'input-data');
+                    dishSelect.innerHTML = `
+                        <option value="">Valige roog</option>
+                        ${data.dishes.map(dish => `<option value="${dish.id}" ${dish.dish_name === originalData.dishName ? 'selected' : ''}>${dish.dish_name}</option>`).join('')}
+                    `;
+                    cells[3].innerHTML = '';
+                    cells[3].appendChild(dishSelect);
+                })
+                .catch(error => {
+                    console.log("Viga roogade hankimisel:", error);
+                });
+        }
+
+        this.classList.add('update-menu-item');
+        this.classList.remove('edit-menu-item');
+        this.textContent = 'Uuenda';
+    });
+});
+
+document.addEventListener('click', function(event) {
+    if (event.target.classList.contains('update-menu-item')) {
+        const button = event.target;
+        const menuItemId = button.getAttribute('data-id');
+        const row = button.closest('tr');
+        const cells = row.querySelectorAll('td');
+
+        const weekNumberInput = cells[0].querySelector('.input-data');
+        const weekdayInput = cells[1].querySelector('.input-data');
+        const categoryInput = cells[2].querySelector('.input-data');
+        const dishSelect = cells[3].querySelector('.input-data');
+
+        if (!weekNumberInput || !weekdayInput || !categoryInput || !dishSelect) {
+            return;
+        }
+        
+        const weekNumber = weekNumberInput.value;
+        const weekday = weekdayInput.value;
+        const category = categoryInput.value;
+        const dishId = dishSelect.value;
+
+        sendToServer(menuItemId, dishId);
+    }
+});
+
+function sendToServer(id, dishId) {
+    const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+
+    fetch(`/update_menu_item/${id}/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken,
+        },
+        body: JSON.stringify({
+            dish_id: dishId,
+        }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        }
+    })
+    .catch(error => {
+        console.log("Viga:", error);
+    });
+}
+document.getElementById('replace_week_btn').addEventListener('click', function() {
+    const existingWeek = document.getElementById('existing_week_nr').value;
+    const newWeek = document.getElementById('new_week_nr').value;
+    const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+
+    if (!existingWeek || !newWeek) {
+        alert('Palun valige olemasolev nädal ja sisestage uus nädalanumber.');
+        return;
+    }
+
+    if (newWeek < 1 || newWeek > 52) {
+        alert('Nädala number peab olema vahemikus 1 kuni 52.');
+        return;
+    }
+
+    fetch('/replace_week_number/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken,
+        },
+        body: JSON.stringify({
+            existing_week: existingWeek,
+            new_week: newWeek,
+        }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Nädala number on edukalt muudetud!');
+            location.reload();
+        } else {
+            alert('Viga nädala numbri muutmisel: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Viga:', error);
+        alert('Päringu täitmisel ilmus viga.');
+    });
+});
+</script>
+{% endblock %}
