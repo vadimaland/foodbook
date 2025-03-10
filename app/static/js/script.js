@@ -12,7 +12,7 @@ $("#id_tabel_number").keyup(function(e){
         console.log(response);
         if(response=="True"){
           $(".tb_error").remove();
-          $("<span class='tb_error' style='padding: 5px;color: red;'>Табельный номер не существует или уже зарегистрирован!</span>").insertAfter("#id_tabel_number");
+          $("<span class='tb_error' style='padding: 5px;color: red;'>Töötaja numbrit ei ole olemas või see on juba registreeritud!</span>").insertAfter("#id_tabel_number");
 }
         else{
           $(".tb_error").remove();
@@ -23,7 +23,7 @@ $("#id_tabel_number").keyup(function(e){
           $("#id_password1").attr("disabled", false)
           $("#id_password2").attr("disabled", false)
           $("#reg").attr("disabled", false)
-          $("<span class='tb_error' style='padding: 5px;color: green;'>Регистрация доступна!</span>").insertAfter("#id_tabel_number");
+          $("<span class='tb_error' style='padding: 5px;color: green;'>Registreerimine on võimalik!</span>").insertAfter("#id_tabel_number");
 }
       })
       .fail(function(){
