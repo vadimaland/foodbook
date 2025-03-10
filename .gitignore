@@ -1,8 +1,8 @@
-# Игнорировать виртуальное окружение
+# ignore irtual environment
 venv/
 .env
 
-# Конфигурационные файлы IDE
+# IDE config files
 .vscode/
 .idea/
 *.suo
@@ -12,25 +12,25 @@ venv/
 *.sw?
 *.log
 
-# Кеши Python
+# Python cache
 __pycache__/
 *.py[cod]
 *$py.class
 
-# Логи и временные файлы
+# Logs and temp files
 *.log
 *.bak
 *.swp
 *.tmp
 .DS_Store
 
-# Файлы, которые генерирует `pip`
+# `pip` generated files
 pip-log.txt
 pip-delete-this-directory.txt
 
-# Файлы, которые генерирует Django
+# Django generated files
 *.pyc
 *.pyo
 
-# Файл с паролями
+# password file
 passwords.py
