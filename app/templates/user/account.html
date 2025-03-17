@@ -1,0 +1,169 @@
+{% extends "user/homebase.html" %}
+{% load static %}
+{% block content %}
+{% for message in messages %}
+{% if message.tags == 'error' %}
+   <div class="alert alert-danger alert-dismissible fade show" role="alert">
+{% else %}
+   <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert">
+{% endif %}
+{{ message }}
+<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Sulge"></button>
+</div>
+{% endfor%}
+<div class="container">
+    <div class="main-body">
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                                <h6 class="mb-0">Statistika: </h6>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                                <h6 class="mb-0">Tellimusi: </h6>
+                                <span class="text-secondary">{{ order_stats.total_orders }}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                                <h6 class="mb-0">Väljastatud: </h6>
+                                <span class="text-secondary">{{ order_stats.closed_orders }}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                                <h6 class="mb-0">Aktiivsed: </h6>
+                                <span class="text-secondary">{{ order_stats.future_orders }}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                                <h6 class="mb-0">Aegunud: </h6>
+                                <span class="text-secondary">{{ order_stats.expired_orders }}</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-8">
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <form action="{% url 'upd_user' %}" enctype="multipart/form-data" method="post">
+                            {% csrf_token %}
+                        <div class="row mb-3">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Kasutajanimi</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                <input type="text" class="form-control" value="{{ user.username }}" disabled>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Töötaja number</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                <input type="text" class="form-control" value="{{user.tabel_number}}" disabled>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Registreerimise kuupäev</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                <input type="text" class="form-control" value="{{user.date_joined}}" disabled>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Kontojääk</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                <input type="text" class="form-control" value="{{user.balance}}" disabled>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Eesnimi</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                <input type="text" name="{{ form.first_name.name}}" class="form-control" id="{{ form.first_name.id_for_label }}" value="{{user.first_name}}"  required>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Perekonnanimi</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                <input type="text" name="{{ form.last_name.name }}" class="form-control" id="{{ form.last_name.id_for_label }}" value="{{user.last_name}}" required>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">E-post</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                <input type="email" name="{{ form.email.name }}" class="form-control" id="{{ form.email.id_for_label }}" value="{{user.email}}" required>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Linn</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                <select name="city"  class="form-select" required>
+                                    {% for city in cities %}
+                                        <option value="{{ city.id }}" {% if city.id == user.city_id %}selected{% endif %}>{{ city.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-3"></div>
+                            <div class="col-sm-9 text-end">
+                                <button class="btn btn-primary px-4" type="submit">Uuenda andmeid</button>
+                            </div>
+                        </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <form action="{% url 'upd_pswd' %}" enctype="multipart/form-data" method="post">
+                        {% csrf_token %}
+                        <div class="row mb-3">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Vana parool</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                <input type="password" name="current_password" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Uus parool</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                <input type="password" name="new_password" class="form-control"   required>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Uus parool uuesti</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                <input type="password" name="retype_new_password" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-3"></div>
+                            <div class="col-sm-9 text-end">
+                                <button class="btn btn-primary px-4" type="submit">Muuda parooli</button>
+                            </div>
+                        </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}

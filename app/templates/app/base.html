@@ -1,0 +1,228 @@
+<!--app/templates/app/base.html-->
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>foodbook</title>
+    <link rel="icon" type="image/x-icon" href="{% static 'img/favicon.ico' %}">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flaticon-test-uicons@1.7.2/css/all/all.min.css">
+
+    {% block style %}
+    {% endblock %}
+  </head>
+  <body>
+    <div class="container">
+      <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
+        <a href="/" class="d-flex align-items-center text-decoration-none">
+          <span class="fs-4">foodbook</span>
+        </a>
+      </header>
+    </div>
+    <div class="container col-xl-10 col-xxl-8 px-4">
+      <div class="main d-flex row align-items-start g-lg-5 py-5">
+    {% block content %} 
+    {% endblock %}
+    {% block form %} 
+    {% endblock %}
+      </div>
+    </div>
+    <div class="modal fade" id="GDPR_modal" tabindex="-1" aria-labelledby="GDPR_modalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="GDPR_modalLabel">Kasutajatingimused</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p>
+              Kasutajatingimused lõunasöökide tellimise süsteemi veebirakendusele tootmisettevõttes Aquaphor International OÜ
+            </p>
+            <ol>
+              <li>
+                <strong>Üldsätted</strong>
+                <ol>
+                  <li>
+                    Käesolevad kasutajatingimused (edaspidi "Tingimused") reguleerivad suhteid Aquaphor International OÜ (registreerimisnumber: [sisesta registreerimisnumber], aadress: [sisesta aadress]) ja töötaja (edaspidi "Kasutaja") vahel, kes kasutab lõunasöökide tellimise süsteemi veebirakendust (edaspidi "Rakendus").
+                  </li>
+                  <li>
+                    Rakenduse kasutamine tähendab kasutaja täielikku ja tingimusteta nõusolekut käesolevate tingimustega.
+                  </li>
+                  <li>
+                    Aquaphor International OÜ jätab endale õiguse muuta käesolevaid tingimusi. Kõik muudatused jõustuvad nende avaldamise hetkest rakenduses.
+                  </li>
+                </ol>
+              </li>
+              <li>
+                <strong>Rakenduse eesmärk</strong>
+                <ol>
+                  <li>
+                    Rakendus on loodud Aquaphor International OÜ töötajate lõunasöökide tellimise protsessi lihtsustamiseks.
+                  </li>
+                  <li>
+                    Kasutaja kohustub kasutama rakendust ainult isiklikel eesmärkidel, mis on seotud lõunasöökide tellimise teenuse kasutamisega.
+                  </li>
+                </ol>
+              </li>
+              <li>
+                <strong>Poolte õigused ja kohustused</strong>
+                <ol>
+                  <li>
+                    Aquaphor International OÜ kohustub:
+                    <ul>
+                      <li>Tagama kasutajale ligipääsu rakendusele</li>
+                      <li>Tagada rakenduse korrektne töö</li>
+                      <li>Esitada info saadaolevate roogade ja nende hinna kohta</li>
+                    </ul>
+                  </li>
+                  <li>
+                    Kasutaja kohustub:
+                    <ul>
+                      <li>Kasutama rakendust vastavalt selle otstarbele</li>
+                      <li>Tasuma rakenduse kaudu tehtud tellimused täielikult</li>
+                      <li>Mitte kasutada rakendust käesolevate tingimustega mitteühilduvatel eesmärkidel</li>
+                    </ul>
+                  </li>
+                </ol>
+              </li>
+              <li>
+                <strong>Tellimuste tasumine</strong>
+                <ol>
+                  <li>
+                    Kasutaja nõustub, et kõik rakenduse kaudu tehtud tellimused tuleb tasuda täielikult.
+                  </li>
+                  <li>
+                    Tellimuste maksumus määratakse rakenduses esitatud info põhjal ja võib sisaldada Eesti seadusandlusega ettenähtud makse ja tasusid.
+                  </li>
+                  <li>
+                    Tellimuste tasumine võib toimuda rakendusse integreeritud maksesüsteemi kaudu või muul Aquaphor International OÜ poolt määratud viisil.
+                  </li>
+                </ol>
+              </li>
+              <li>
+                <strong>Vastutus</strong>
+                <ol>
+                  <li>
+                    Aquaphor International OÜ ei vastuta kasutajale tekitatud kahju eest, mis on tingitud rakenduse valest kasutamisest, välja arvatud juhul kui kahju on põhjustatud Aquaphor International OÜ tahtlikust tegevusest või suurest hooletusest.
+                  </li>
+                  <li>
+                    Kasutaja vastutab täielikult rakenduse kaudu tehtud tellimuste eest tasumise ning rakenduse valekasutamise tagajärgede eest.
+                  </li>
+                </ol>
+              </li>
+              <li>
+                <strong>Andmete konfidentsiaalsus ja kaitse</strong>
+                <ol>
+                  <li>
+                    Aquaphor International OÜ kohustub järgima Eesti isikuandmete kaitse seadusi ja tagama kasutaja poolt esitatud info konfidentsiaalsuse.
+                  </li>
+                  <li>
+                    Kasutaja nõustub, et Aquaphor International OÜ võib koguda ja töödelda isikuandmeid, mis on vajalikud rakenduse kasutamiseks, sealhulgas kuid mitte piiratud nime, kontaktandmete ja tellimuste andmetega.
+                  </li>
+                </ol>
+              </li>
+              <li>
+                <strong>Lepingu lõppemine</strong>
+                <ol>
+                  <li>
+                    Aquaphor International OÜ jätab endale õiguse ühepoolselt lõpetada leping, kui kasutaja rikub käesolevaid tingimusi.
+                  </li>
+                  <li>
+                    Kasutaja võib lõpetada rakenduse kasutamise igal ajal, kuid kohustub tasuma kõik lepingu lõppemise hetkeks tehtud tellimused.
+                  </li>
+                </ol>
+              </li>
+              <li>
+                <strong>Vaidluste lahendamine</strong>
+                <ol>
+                  <li>
+                    Kõik lepingu täitmisest tulenevad vaidlused ja lahkarvamused tuleb lahendada poolte vaheliste läbirääkimiste teel.
+                  </li>
+                  <li>
+                    Kui vaidlust ei õnnestu lahendada läbirääkimiste teel, allub see lahendamisele Eesti seaduste kohaselt.
+                  </li>
+                </ol>
+              </li>
+              <li>
+                <strong>Lõppsätted</strong>
+                <ol>
+                  <li>
+                    Käesolev leping reguleeritakse ja tõlgendatakse vastavalt Eesti seadustele.
+                  </li>
+                  <li>
+                    Kui mõni käesoleva lepingu sätteid tunnistatakse kehtetuks või jõustumisvõimetuks, ei mõjuta see ülejäänud sätete kehtivust.
+                  </li>
+                  <li>
+                    Käesolev leping jõustub kasutaja nõusoleku andmisel selle tingimustega ja kehtib kuni lepingu lõppemiseni vastavalt punktile 7.1.
+                  </li>
+                </ol>
+              </li>
+            </ol>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Tingimused on arusaadavad</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="{% static 'js/bootstrap.js' %}"></script>
+    <script src="{% static 'js/jquery-3.7.1.min.js' %}"></script>
+    <script>
+      $("#id_tabel_number").keyup(function(e){
+        e.preventDefault();
+        var tabel_number = $(this).val();
+        console.log(tabel_number.length);
+        if(tabel_number.length === 4){
+          $.ajax({
+            url: '{% url 'check_tabel_number' %}',
+            type: 'POST',
+            data: {tabel_number: tabel_number},
+
+            success: function(response){
+              console.log(response);
+              if(response.exists){
+                $(".tb_error").remove();
+                $("<span class='tb_error' style='padding: 5px;color: red;'>" + response.message + "</span>").insertAfter("#id_tabel_number");
+              } else {
+                $(".tb_error").remove();
+                $("#id_username").attr("disabled", false);
+                $("#id_first_name").attr("disabled", false);
+                $("#id_last_name").attr("disabled", false);
+                $("#id_email").attr("disabled", false);
+                $("#id_password1").attr("disabled", false);
+                $("#id_password2").attr("disabled", false);
+                const checkbox = document.getElementById('GDPR');
+                const submitButton = document.getElementById('reg');
+               
+                checkbox.addEventListener('change', function() {
+                    if (this.checked) {
+                        $("#reg").attr("disabled", false);
+                    } else {
+                        $("#reg").attr("disabled", true);
+                    }
+                });
+                $("<span class='tb_error' style='padding: 5px;color: green;'>" + response.message + "</span>").insertAfter("#id_tabel_number");
+              }
+            },
+            error: function(){
+              console.log("failed");
+            }
+          });
+        } else {
+          $("#id_username").attr("disabled", true);
+          $("#id_first_name").attr("disabled", true);
+          $("#id_last_name").attr("disabled", true);
+          $("#id_email").attr("disabled", true);
+          $("#id_password1").attr("disabled", true);
+          $("#id_password2").attr("disabled", true);
+          $("#reg").attr("disabled", true);
+          $(".tb_error").remove();
+        }
+      });
+    </script>
+    {% block custom_js %} 
+    {% endblock %}
+  </body>
+</html>

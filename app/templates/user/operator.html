@@ -1,0 +1,65 @@
+<!-- app/templates/user/operator.html -->
+{% extends "user/homebase.html" %}
+{% load static %}
+{% block content %}
+{% for message in messages %}
+{% if message.tags == 'error' %}
+   <div class="alert alert-danger alert-dismissible fade show" role="alert">
+{% else %}
+   <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert">
+{% endif %}
+{{ message }}
+<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+<div class="container">
+    <div class="card">
+        <div class="card-body">
+            <h3 class="lh-1 text-body-emphasis mb-1">Nädal {{ wn }}, {{ today }}</h3>
+            <form action="{% url 'operator' %}" enctype="multipart/form-data" method="post">
+            {% csrf_token %}
+            <div class="row mb-3">
+                <div class="col-sm-3">
+                    <h6 class="mb-0">Tabelinumber</h6>
+                </div>
+                <div class="col-sm-9 text-secondary">
+                    <input type="text" name="tabel_number" class="form-control" required>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-sm-3"></div>
+                <div class="col-sm-9 text-end">
+                    <button class="btn btn-primary px-4" type="submit">Kontrolli tellimust</button>
+                </div>
+            </div>
+            </form>
+        </div>
+    </div>
+
+{% if orders %}
+<div class="card mt-3">
+    <div class="card-body">
+        <h5 class="card-title">Tellimuse üksikasjad</h5>
+        <p><strong>Tellimuse number:</strong> {{ orders.first.order_number }}</p>
+        <p><strong>Aasta:</strong> {{ order_year }} - <strong>Nädal:</strong> {{ orders.first.menu_id.week_number.number }} - <strong>Päev:</strong> {{ orders.first.menu_id.weekday_id.weekday_name }}</p>
+        <hr>
+        <h6>Roogud:</h6>
+        <ul>
+            {% for order in orders %}
+            <li>
+                <strong>{{ order.menu_id.dish_id.category.category_name }}:</strong> {{ order.menu_id.dish_id.dish_name }} ({{ order.quantity }} portsjon)
+            </li>
+            {% endfor %}
+        </ul>
+        <hr>
+        <p><strong>Koguhind:</strong> <strong>{{ total_price }} EUR</strong></p>
+        <form action="{% url 'archive_order' %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="order_number" value="{{ orders.first.order_number }}">
+            <input type="hidden" name="status" value="1">
+            <button type="submit" class="btn btn-success">Väljastada</button>
+        </form>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

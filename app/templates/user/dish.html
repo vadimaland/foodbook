@@ -1,0 +1,143 @@
+<!--app/templates/user/dish.html -->
+{% extends "user/homebase.html" %}
+{% load static %}
+{% block content %}
+<div class="col-md-8 col-lg-6">
+    <h3 class="display-4 lh-1 text-body-emphasis mb-3">Lisa uus roog</h3>
+    <form method="post" action="{% url 'dish' %}" class="needs-validation" novalidate>
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="{{ form.dish_name.id_for_label }}" class="form-label">Roa nimi</label>
+            {{ form.dish_name }}
+            <div class="invalid-feedback">
+                Palun sisestage roa nimi.
+            </div>
+        </div>
+        <div class="mb-3">
+            <label for="{{ form.dish_price.id_for_label }}" class="form-label">Hind</label>
+            {{ form.dish_price }}
+            <div class="invalid-feedback">
+                Palun sisestage roa hind.
+            </div>
+        </div>
+        <div class="mb-3">
+            <label for="{{ form.category.id_for_label }}" class="form-label">Kategooria</label>
+            {{ form.category }}
+            <div class="invalid-feedback">
+                Palun valige roa kategooria.
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Lisa roog</button>
+    </form>
+</div>
+<div class="col-md-8 col-lg-6">
+    <h3 class="display-4 lh-1 text-body-emphasis ">Rogude nimekiri</h3>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">
+                    <a href="?sort_by=category&sort_order={% if sort_by == 'category' and sort_order == 'asc' %}desc{% else %}asc{% endif %}">Kategooria</a>
+                </th>
+                <th scope="col">
+                    <a href="?sort_by=dish_name&sort_order={% if sort_by == 'dish_name' and sort_order == 'asc' %}desc{% else %}asc{% endif %}">Nimi</a>
+                </th>
+                <th scope="col">
+                    <a href="?sort_by=dish_price&sort_order={% if sort_by == 'dish_price' and sort_order == 'asc' %}desc{% else %}asc{% endif %}">Hind</a>
+                </th>
+                <th scope="col">Tegevused</th>
+            </tr>
+        </thead>
+        {% for message in messages %}
+{% if message.tags == 'error' %}
+   <div class="alert alert-danger alert-dismissible fade show" role="alert">
+{% else %}
+   <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert">
+{% endif %}
+{{ message }}
+<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+        <tbody>
+            {% for dish in dishes %}
+            <tr>
+                <td data-id="{{ dish.id }}">{{ dish.category }}</td>
+                <td class="editable" data-id="{{ dish.id }}" data-type="dish_name">{{ dish.dish_name }}</td>
+                <td class="editable" data-id="{{ dish.id }}" data-type="dish_price">{{ dish.dish_price }}</td>
+                <td>
+                    <div class="d-flex">
+                        <form method="POST" action="{% url 'dish_del' %}" class="delete-form">
+                            {% csrf_token %}
+                            <input type="hidden" value="{{ dish.id }}" name="delete-id">
+                            <button type="submit" class="btn btn-danger btn-sm delete-button me-1"><i class="uil uil-trash-alt"></i></button>                        
+                        </form>
+                        <button id="{{ dish.id }}" class="btn btn-primary edit_btn btn-sm"><i class="uil uil-edit"></i></button>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+{% endblock %}
+
+{% block custom_js %}
+<script>
+    // Redigeerimise käitlemine
+    $(document).on("click", ".edit_btn", function(){
+        var id = $(this).attr("id");
+        var elem = document.querySelectorAll("[data-id='" + id + "']");
+        for (var i = 0, len = elem.length; i < len; i++){
+            var value = $(elem[i]).text();
+            var input = "<input type='text' class='input-data' value='" + value + "' class='form-control'>";
+            $(elem[i]).removeClass("editable");
+            $(elem[i]).html(input);
+        }
+        $(this).addClass("upd_btn").text("Uuenda");
+        $(this).removeClass("edit_btn");
+    });
+
+    // Uuendamise käitlemine
+    $(document).on("click", ".upd_btn", function(){
+        var id = $(this).attr("id");
+        var elem = document.querySelectorAll("[data-id='" + id + "']");
+        for (var i = 0, len = elem.length; i < len; i++){
+            var value = $(elem[i]).find('.input-data').val(); // Leiame sisendi väärtuse
+            var td = $(elem[i]).closest('td'); // Kasutame 'closest'-funktsiooni lähima <td> elemendi leidmiseks
+            if (td.length > 0) {
+                td.html(value).addClass("editable"); // Asendame sisu uue väärtusega ja lisame klassi "editable"
+            } else {
+                console.log("TD elementi ei leitud:", elem[i]);
+            }
+        }
+        var type = td.data("type");
+        $(this).addClass("edit_btn").text("Muuda");
+        $(this).removeClass("upd_btn");
+        sendToserver(td.data("id"), value, type);
+    });
+
+    function sendToserver(id, value, type){
+        $.ajax({
+            url: "{% url 'dish_update' %}",
+            type: "POST",
+            data: JSON.stringify({id: id, value: value, type: type}),
+            contentType: "application/json",
+            headers: {
+                "X-CSRFToken": "{{ csrf_token }}"
+            },
+            success: function(response) {
+                if (response.status === 'success') {
+                    console.log("Andmed uuendati edukalt");
+                    // Värskendame tabelit
+                } else {
+                    console.log("Viga andmete uuendamises:", response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.log("Viga:", error);
+            }
+        });
+    }
+</script>
+{% endblock %}

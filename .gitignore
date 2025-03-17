@@ -1,0 +1,39 @@
+# ignore irtual environment
+venv/
+.env
+
+# IDE config files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.log
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Logs and temp files
+*.log
+*.bak
+*.swp
+*.tmp
+.DS_Store
+
+# `pip` generated files
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Django generated files
+*.pyc
+*.pyo
+
+# password file
+passwords.py
+
+# database file
+pg_schema.sql

@@ -1,0 +1,260 @@
+{% extends "user/homebase.html" %}
+{% load static %}
+{% block content %}
+<div class="container">
+    <div class="main-body">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h3 class="lh-1 text-body-emphasis mb-2">Saldo ja tehingud</h3>
+
+                        <!-- Kuvatakse praegune saldo -->
+                        <div class="row mb-3 text-end">
+                            <h6 class="mb-0">
+                                Saldo: {{ user.balance }} EUR
+                            </h6>
+                        </div>
+
+                        <!-- Nupp saldo täiendamiseks -->
+                        <div class="row mb-3">
+                            <div class="col-sm-3"></div>
+                            <div class="col-sm-9 text-end">
+                                <button class="btn btn-primary px-4" data-bs-toggle="modal" data-bs-target="#depositModal">Tee sissemakse</button>
+                            </div>
+                        </div>
+
+                        <!-- Filtrid aasta ja kuu järgi -->
+                        <div class="row mb-3">
+                            <div class="col-sm-3">
+                                <select id="yearFilter" class="form-select">
+                                    <option value="">Kõik aastad</option>
+                                    {% for year in unique_years %}
+                                        <option value="{{ year }}">{{ year }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-sm-3">
+                                <select id="monthFilter" class="form-select">
+                                    <option value="">Kõik kuud</option>
+                                    {% for month in unique_months %}
+                                        <option value="{{ month }}">{{ month }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="col-sm-6 d-flex gap-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="filterDeposit" checked onchange="filterTransactions()">
+                                    <label class="form-check-label" for="filterDeposit">Sissemaksed</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="filterWithdrawal" checked onchange="filterTransactions()">
+                                    <label class="form-check-label" for="filterWithdrawal">Väljamaksed</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="filterRefund" checked onchange="filterTransactions()">
+                                    <label class="form-check-label" for="filterRefund">Tagasimaksed</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tehingute ajalugu -->
+                        <h4 class="mt-4">Tehingute ajalugu</h4>
+                        <div class="accordion mt-3" id="transactionsAccordion">
+                            {% for transaction in transactions %}
+                            <div class="accordion-item" 
+                                 data-year="{{ transaction.created_at|date:'Y' }}" 
+                                 data-month="{{ transaction.created_at|date:'n' }}" 
+                                 data-type="{% if transaction.transaction_type == 'deposit' %}deposit{% else %}withdrawal{% endif %}"
+                                 data-has-refund="{% if transaction.payment_reference %}true{% else %}false{% endif %}">
+                                <h2 class="accordion-header" id="heading{{ forloop.counter }}">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ forloop.counter }}" aria-expanded="false" aria-controls="collapse{{ forloop.counter }}">
+                                        {{ transaction.created_at|date:"d.m.Y H:i:s" }}&nbsp;&nbsp; 
+                                        {% if transaction.transaction_type == 'deposit' %}
+                                            <span style="color: green;">+{{ transaction.amount }} EUR</span>
+                                        {% else %}
+                                            <span style="color: red;">-{{ transaction.amount }} EUR</span>
+                                        {% endif %}
+                                    </button>
+                                </h2>
+                                <div id="collapse{{ forloop.counter }}" class="accordion-collapse collapse" aria-labelledby="heading{{ forloop.counter }}" data-bs-parent="#transactionsAccordion">
+                                    <div class="accordion-body">
+                                        {{ transaction.description }}
+                                        {% if transaction.payment_reference %}
+                                            <button class="btn btn-danger btn-sm mt-2" data-bs-toggle="modal" data-bs-target="#refundModal" data-transaction-id="{{ transaction.id }}" data-amount="{{ transaction.amount }}">Tagasimakse</button>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <p>Tehinguid ei ole</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modaalaken saldo täiendamiseks -->
+<div class="modal fade" id="depositModal" tabindex="-1" aria-labelledby="depositModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="depositModalLabel">Saldo täiendamine</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Sulge"></button>
+            </div>
+            <div class="modal-body">
+                <form id="depositForm" action="{% url 'initiate_payment' user.id %}" method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="amount">Summa (EUR):</label>
+                        <input type="number" class="form-control" id="amount" name="amount" step="0.10" min="0.10" value="10.00" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Maksa</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modaalaken tagasimakseks -->
+<div class="modal fade" id="refundModal" tabindex="-1" aria-labelledby="refundModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="refundModalLabel">Tagasimakse kinnitamine</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Sulge"></button>
+            </div>
+            <div class="modal-body">
+                <p>Kas olete kindel, et soovite raha tagasi saada?</p>
+                <form id="refundForm">
+                    {% csrf_token %}
+                    <input type="hidden" id="refundTransactionId" name="transaction_id">
+                    <input type="hidden" id="refundAmount" name="amount">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tühista</button>
+                <button type="button" class="btn btn-danger" id="confirmRefund">Kinnita tagasimakse</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+ document.getElementById('depositForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const amount = parseFloat(document.getElementById('amount').value).toFixed(2);
+        if (!amount || isNaN(amount)) {
+            alert('Palun sisestage korrektne summa.');
+            return;
+        }
+        fetch("{% url 'initiate_payment' user.id %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({ amount: amount })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.payment_link) {
+                window.location.href = data.payment_link;
+            } else {
+                alert(data.error || 'Viga makse algatamisel.');
+            }
+        });
+    });
+    // Käsitleja nupule "Tagasimakse"
+    document.querySelectorAll('[data-bs-target="#refundModal"]').forEach(button => {
+        button.addEventListener('click', function() {
+            const transactionId = this.getAttribute('data-transaction-id');
+            const amount = this.getAttribute('data-amount');
+            document.getElementById('refundTransactionId').value = transactionId;
+            document.getElementById('refundAmount').value = amount;
+        });
+    });
+
+    // Käsitleja nupule "Kinnita tagasimakse"
+    document.getElementById('confirmRefund').addEventListener('click', function() {
+        const transactionId = document.getElementById('refundTransactionId').value;
+        const amount = document.getElementById('refundAmount').value;
+
+        fetch("{% url 'initiate_refund' user.id %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+                transaction_id: transactionId,
+                amount: amount
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Tagasimakse sooritati edukalt.');
+                location.reload(); // Lehe uuestilaadimine andmete uuendamiseks
+            } else {
+                alert('Viga tagasimaksel: ' + data.error);
+            }
+        })
+        .catch(error => {
+            alert('Viga tagasimaksel: ' + error.message);
+        });
+    });
+
+    // Funktsioon tehingute filtreerimiseks
+    function filterTransactions() {
+        const selectedYear = document.getElementById('yearFilter').value;
+        const selectedMonth = document.getElementById('monthFilter').value;
+        const showDeposits = document.getElementById('filterDeposit').checked;
+        const showWithdrawals = document.getElementById('filterWithdrawal').checked;
+        const showRefunds = document.getElementById('filterRefund').checked;
+
+        const transactions = document.querySelectorAll('#transactionsAccordion .accordion-item');
+
+        transactions.forEach(item => {
+            const year = item.getAttribute('data-year');
+            const month = item.getAttribute('data-month');
+            const type = item.getAttribute('data-type');
+            const hasRefund = item.getAttribute('data-has-refund') === 'true';
+
+            const yearMatch = !selectedYear || year === selectedYear;
+            const monthMatch = !selectedMonth || month === selectedMonth;
+
+            // Filtreerimine tehingu tüübi järgi
+            let typeMatch = false;
+            if (type === 'deposit' && showDeposits) {
+                typeMatch = true;
+            } else if (type === 'withdrawal' && showWithdrawals) {
+                typeMatch = true;
+            }
+
+            // Filtreerimine tagasimaksete järgi
+            const refundMatch = !hasRefund || (hasRefund && showRefunds);
+
+            // Kuvatakse tehing, kui see vastab kõigile filtritele
+            if (yearMatch && monthMatch && (typeMatch || (hasRefund && showRefunds))) {
+                item.style.display = '';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    }
+
+    // Määratakse sündmuste käsitlejad filtritele
+    document.getElementById('yearFilter').addEventListener('change', filterTransactions);
+    document.getElementById('monthFilter').addEventListener('change', filterTransactions);
+    document.getElementById('filterDeposit').addEventListener('change', filterTransactions);
+    document.getElementById('filterWithdrawal').addEventListener('change', filterTransactions);
+    document.getElementById('filterRefund').addEventListener('change', filterTransactions);
+
+    // Filtreerimise initsialiseerimine lehe laadimisel
+    document.addEventListener('DOMContentLoaded', filterTransactions);
+</script>
+{% endblock %}

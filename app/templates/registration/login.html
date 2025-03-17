@@ -1,0 +1,76 @@
+<!--app/templates/registration/login.html-->
+{% extends "app/base.html" %}
+{% block style %}
+<style>
+  .login{
+    margin-top: 75px;
+  }
+  @media screen and (max-width: 600px){
+
+    .main {
+       flex-direction: column-reverse;  
+     }
+    .login{
+      margin-top: 0px;
+      margin-bottom: 25px;
+    }
+  }
+</style>
+{% endblock %}
+{% block form %}
+
+      <div class="col-md-6 order-1 order-md-2"  >
+        <!-- templates/registration/login.html -->
+        <form class="login form p-4 p-md-5 border rounded-3 bg-body-tertiary" method="post">
+            {% if form.errors %}
+            <div class="alert alert-danger alert-dismissible" role="alert">
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                {% for field in form %}
+                    {% if field.errors %}
+                        <span>{{ field.label }}: {{ field.errors|striptags }}</span><br>
+                    {% endif %}
+                {% endfor %}
+                {% for error in form.non_field_errors  %}
+                    <span>Error: {{ error|striptags }}</span>
+                {% endfor %}
+            </div>
+            {% endif %}
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ next }}">
+          <div class="form-floating mb-3">
+            <input type="text" name="{{ form.username.name }}" class="form-control" id="{{ form.username.id_for_label }}" >
+            <label for="id_username">Kasutajanimi:</label>
+          </div>
+          <div class="form-floating mb-3">
+            <input type="password" name="{{ form.password.name }}" class="form-control" id="{{ form.password.id_for_label }}">
+            <label for="id_password">Salasõna:</label>
+          </div>
+          <button class="w-100 btn btn-lg btn-primary" type="submit">Logi sisse</button>
+          <small class="d-flex justify-content-end"><a class="text-decoration-none pt-2" href="{% url 'password_reset' %}">Unustasid salasõna?</a></small>
+          <hr class="my-4">
+          <small class="text-body-secondary">Kui teil pole kasutajatunnust, palun <a class="text-decoration-none" href="{% url 'sign_up' %}">registreeruge</a></small>
+         </form>
+      </div>
+
+{% endblock %}
+{% block content %}
+<div class="col-md-8 col-lg-6">
+  <div class="col align-items-start">
+    <h1>Tere tulemast lõunasöökide tellimisportaali!</h1>
+    <p>
+                See veebileht on loodud selleks, et Aquaphor International OÜ töötajad Narvas ja Sillamäel saaksid ennetähtaegselt tellida toitlustusteenuseid.
+    </p>
+    <p>
+                Portaali kaudu on võimalik tellida lõunasööki nii käesolevale kui ka järgmisele nädalale, valides endale sobiva valiku pakutavast menüüst.
+    </p>
+    <p>
+                Alustamiseks logige süsteemi sisse oma kasutajatunnuste abil. Kui kasutate süsteemi esmakordselt, palun registreeruge, märkides oma töötaja numbri. Teie töötaja number asub viimase palgalehe failinimes, mille olete saanud oma e-postile.
+    </p>
+    <p>
+                Head isu!
+    </p>
+
+</div>
+</div>
+{% endblock %}
+
