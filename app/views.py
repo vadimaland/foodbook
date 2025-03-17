@@ -1377,7 +1377,7 @@ def initiate_payment(request, user_id):
                 "api_username": EVERYPAY_API_USERNAME,
                 "email": user_email,
                 "customer_ip": request.META.get('REMOTE_ADDR'),
-                "locale": "ee",
+                "locale": "et",
                 "billing_city": "Sillamäe",
                 "billing_country": "EE",
                 "billing_line1": "L.Tolstoi 2A",

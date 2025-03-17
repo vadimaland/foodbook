@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = passwords.key
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = [
     passwords.externalip,
@@ -161,4 +161,3 @@ EVERYPAY_API_URL_REFUND = "https://payment.sandbox.lhv.ee/api/v4/payments/refund
 CALLBACK_URL = "https://foodbook.aquaphor.com/callback/"
 EVERYPAY_API_USERNAME = passwords.EVERYPAY_API_USERNAME
 EVERYPAY_API_SECRET = passwords.EVERYPAY_API_SECRET
-CALLBACK_URL = passwords.callbackurl
