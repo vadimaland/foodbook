@@ -1532,7 +1532,11 @@ def initiate_refund(request, user_id):
             user = User.objects.get(id=user_id)
             data = json.loads(request.body)
             transaction_id = data.get('transaction_id')
-            amount = Decimal(data.get('amount'))
+            amount_str = data.get('amount')
+            if amount_str:
+                amount_str = amount_str.replace(',', '.')
+
+            amount = Decimal(amount_str)
 
             # Kontrollime saadaolevat saldot
             if amount > user.balance:
