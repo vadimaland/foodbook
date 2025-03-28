@@ -161,3 +161,15 @@ EVERYPAY_API_URL_REFUND = "https://payment.sandbox.lhv.ee/api/v4/payments/refund
 CALLBACK_URL = "https://foodbook.aquaphor.com/callback/"
 EVERYPAY_API_USERNAME = passwords.EVERYPAY_API_USERNAME
 EVERYPAY_API_SECRET = passwords.EVERYPAY_API_SECRET
+
+# Redis Cache
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+    }
+}
+
+# Sessions to Redis
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+SESSION_CACHE_ALIAS = "default"
